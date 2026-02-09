@@ -59,7 +59,7 @@
                 StrokeThickness="1"
                 BackgroundColor="#F5F5F5">
             <Label x:Name="WaveformLabel" 
-                   Text="波形显示区域"
+                   Text="音频循环播放器"
                    HorizontalOptions="Center"
                    VerticalOptions="Center"
                    TextColor="#999999"/>

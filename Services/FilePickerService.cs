@@ -1,4 +1,5 @@
 using Microsoft.Maui.Storage;
+using CommunityToolkit.Maui.Storage;
 
 namespace SeamlessLoopTest.Services
 {
@@ -42,7 +43,7 @@ namespace SeamlessLoopTest.Services
         {
             try
             {
-                var result = await FolderPicker.Default.PickAsync();
+                var result = await CommunityToolkit.Maui.Storage.FolderPicker.Default.PickAsync();
                 return result?.Folder?.Path;
             }
             catch (Exception)
