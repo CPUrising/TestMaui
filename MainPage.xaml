@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SeamlessLoopTest.MainPage"
+             Title="Seamless Loop Music">
+
+    <Grid Padding="20" RowDefinitions="Auto,Auto,*,Auto,Auto,Auto">
+        
+        <!-- 文件选择 -->
+        <StackLayout Grid.Row="0" Spacing="10">
+            <Label Text="音频文件:" FontSize="16" FontAttributes="Bold"/>
+            <Grid ColumnDefinitions="*,Auto">
+                <Entry x:Name="FilePathEntry" 
+                       Grid.Column="0"
+                       Placeholder="选择音频文件..."
+                       IsReadOnly="True"/>
+                <Button Grid.Column="1" 
+                        Text="浏览" 
+                        Clicked="OnBrowseClicked"
+                        WidthRequest="100"/>
+            </Grid>
+        </StackLayout>
+
+        <!-- 循环点设置 -->
+        <Grid Grid.Row="1" Margin="0,20,0,0" 
+              RowDefinitions="Auto,Auto,Auto" 
+              ColumnDefinitions="*,*">
+            
+            <Label Grid.Row="0" Grid.Column="0" 
+                   Text="循环起点 (秒):" 
+                   FontSize="14"/>
+            <Entry x:Name="LoopStartEntry" 
+                   Grid.Row="1" Grid.Column="0"
+                   Placeholder="0.0"
+                   Keyboard="Numeric"
+                   Margin="0,5,10,0"/>
+            
+            <Label Grid.Row="0" Grid.Column="1" 
+                   Text="循环终点 (秒):" 
+                   FontSize="14"/>
+            <Entry x:Name="LoopEndEntry" 
+                   Grid.Row="1" Grid.Column="1"
+                   Placeholder="0.0"
+                   Keyboard="Numeric"
+                   Margin="10,5,0,0"/>
+            
+            <Button Grid.Row="2" Grid.ColumnSpan="2"
+                    Text="🎯 智能匹配循环点"
+                    Clicked="OnAutoMatchClicked"
+                    Margin="0,10,0,0"
+                    BackgroundColor="#4CAF50"
+                    TextColor="White"/>
+        </Grid>
+
+        <!-- 波形显示区域 (占位) -->
+        <Border Grid.Row="2" 
+                Margin="0,20,0,0"
+                Stroke="#CCCCCC"
+                StrokeThickness="1"
+                BackgroundColor="#F5F5F5">
+            <Label x:Name="WaveformLabel" 
+                   Text="波形显示区域"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   TextColor="#999999"/>
+        </Border>
+
+        <!-- 播放控制 -->
+        <Grid Grid.Row="3" Margin="0,20,0,0" ColumnDefinitions="*,*,*">
+            <Button Grid.Column="0" 
+                    x:Name="PlayButton"
+                    Text="▶ 播放"
+                    Clicked="OnPlayClicked"
+                    BackgroundColor="#2196F3"
+                    TextColor="White"
+                    Margin="0,0,5,0"/>
+            <Button Grid.Column="1" 
+                    x:Name="PauseButton"
+                    Text="⏸ 暂停"
+                    Clicked="OnPauseClicked"
+                    BackgroundColor="#FF9800"
+                    TextColor="White"
+                    Margin="5,0,5,0"/>
+            <Button Grid.Column="2" 
+                    x:Name="StopButton"
+                    Text="⏹ 停止"
+                    Clicked="OnStopClicked"
+                    BackgroundColor="#F44336"
+                    TextColor="White"
+                    Margin="5,0,0,0"/>
+        </Grid>
+
+        <!-- 进度条 -->
+        <StackLayout Grid.Row="4" Margin="0,20,0,0" Spacing="5">
+            <Label x:Name="ProgressLabel" 
+                   Text="00:00 / 00:00"
+                   HorizontalOptions="Center"/>
+            <Slider x:Name="ProgressSlider"
+                    Minimum="0"
+                    Maximum="100"
+                    ValueChanged="OnProgressChanged"/>
+        </StackLayout>
+
+        <!-- 状态栏 -->
+        <Label Grid.Row="5" 
+               x:Name="StatusLabel"
+               Text="就绪"
+               Margin="0,10,0,0"
+               FontSize="12"
+               TextColor="#666666"
+               HorizontalOptions="Center"/>
+    </Grid>
+</ContentPage>
