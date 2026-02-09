@@ -43,8 +43,13 @@ namespace SeamlessLoopTest.Services
         {
             try
             {
+#if WINDOWS || MACCATALYST
                 var result = await CommunityToolkit.Maui.Storage.FolderPicker.Default.PickAsync();
                 return result?.Folder?.Path;
+#else
+                await Task.CompletedTask;
+                return null;
+#endif
             }
             catch (Exception)
             {

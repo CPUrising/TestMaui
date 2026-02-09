@@ -2,57 +2,56 @@
 
 **日期**: 2026-02-09
 **执行人**: 莱芙・泽诺 (Lev Zenith)
-**状态**: 核心功能迁移完成，环境配置就绪
+**状态**: Windows 联调成功，Android 真机部署成功（运行环境异常待修复）
 
 ---
 
 ## 1. 任务背景
 
-将原有的 WPF 音频循环播放项目迁移至 .NET MAUI 跨平台框架，目标文件夹为 `D:\seamless loop music\TestMaui`。
+推进 MAUI 项目在 Windows 与 Android 双端的实机表现验证，解决环境兼容性问题，并规范 Git 版本管理。
 
-## 2. 已完成工作清单
+## 2. 今日已完成工作清单
 
-### 2.1 环境初始化
+### 2.1 Git 环境规范化 (16:00 - 16:25)
+- **.gitignore**: 创建了针对 .NET MAUI / VS 项目的标准忽略规则，屏蔽了 `bin/`, `obj/`, `.vs/` 等冗余目录。
+- **索引清理**: 从缓存中彻底移除了误追踪的 `obj/` 目录文件，确保仓库轻量化。
 
-- 验证了本地 `maui` 工作负载状态为可用。
-- 在目标目录成功创建了 `.NET MAUI` 应用模版项目。
-- 引入了外部依赖 NuGet 包：
-  - `NAudio` (v2.2.1)：核心音频处理支持。
-  - `NAudio.Vorbis` (v1.5.0)：OGG 格式解码支持。
-  - `CommunityToolkit.Maui` (v7.0.1)：跨平台 UI 组件及 FolderPicker 支持。
+### 2.2 Windows 端功能验证 (16:10 - 16:20)
+- **修复编译**: 解决了 `FilePickerService.cs` 中 `FolderPicker` 命名空间缺失的问题。
+- **联调结果**: 成功在 Windows 10.0.19041 平台上启动。
+  - ✅ 音频文件加载正常。
+  - ✅ **无缝循环播放逻辑通过验证**，NAudio 引擎运作稳定。
 
-### 2.2 核心逻辑迁移 (Core/Audio)
+### 2.3 Android 跨平台适配攻关 (16:30 - 17:10)
+- **环境对齐**: 
+  - 确定了 Android SDK 路径 (`C:\Users\Lenovo\AppData\Local\Android\Sdk`)。
+  - 确定了 JDK 路径为 Android Studio 内置 JBR (`D:\Android Studio\jbr`)。
+  - 下载并安装了 **Android SDK Platform 35 (API 35)** 以匹配 .NET 9.0 要求。
+- **项目配置优化**: 
+  - 在 `SeamlessLoopTest.csproj` 中硬编码了 SDK 与 JDK 路径。
+  - 显式禁用了 **快速部署 (Fast Deployment)**，并强制执行 **程序包嵌入 (EmbedAssembliesIntoApk)** 以提升真机兼容性。
+- **代码修补**: 
+  - 使用 `#if WINDOWS || MACCATALYST` 预编译指令修复了 `FolderPicker` 在 Android 平台下导致的编译硬伤。
+- **真机部署**: 
+  - 成功向真机设备 `9JB0218C14002849` 完成了安装（APK 强制推送）。
 
-- 成功搬运核心引擎文件 `AudioLooper.cs` 与 `LoopStream.cs`。
-- **重构内容**: 统一修改命名空间为 `SeamlessLoopTest.Core.Audio`，确保其在 MAUI 环境下的编译兼容性。
+## 3. 当前风险与异常分析
 
-### 2.3 服务层开发 (Services)
+### 📝 Android 运行闪退分析报告
+- **现象**: 程序安装后能成功显示图标，但点击运行后立即崩溃、闪退。
+- **初步诊断**: 
+    1. **依赖项非法引用**: `AudioLooper` 目前强依赖 NAudio 中的 `WaveOutEvent`，该组件在 Android 平台属于非法指令，会导致运行时崩溃。
+    2. **权限阻断**: 尚未在 AndroidManifest 中完全激活 Android 13+ 针对音频文件的分项读写权限。
+    3. **运行时异常**: 手机端提示缺失部分 `.net` 相关组件（可能是由于快速部署关闭导致的特定环境依赖）。
 
-- 创建了 `FilePickerService.cs`，实现了基于 MAUI 官方 API 的跨平台文件选择逻辑。
-- 集成了 `FolderPicker`，为后续 Windows/macOS 平台的文件夹批量处理预留接口。
+## 4. 后续攻坚计划
 
-### 2.4 UI 界面重构 (Views)
+- [ ] **发声器官重构**: 在 `AudioLooper` 中实现平台隔离，针对 Android 引入 `Android.Media.AudioTrack` 或 `MAUI MediaElement`。
+- [ ] **权限动态申请**: 在加载文件逻辑中加入 MAUI 运行权限请求逻辑。
+- [ ] **部署优化**: 彻底验证独立 APK 安装完整性，消除手机端“下载工具”的误提示。
 
-- **MainPage.xaml**: 使用 Grid 布局重写了播放器界面，包含文件浏览、循环点设置（起点/终点）、进度展示及播放控制区域。
-- **MainPage.xaml.cs**:
-  - 实现了音频文件的异步加载逻辑。
-  - 绑定了播放、暂停、停止等核心控制事件。
-  - 接入了进度条同步更新计时器（100ms 采样）。
-  - 预留了“智能循环点匹配”算法的调用接口。
+---
 
-### 2.5 平台适配配置
+## 5. 结语
 
-- **全局配置**: 在 `MauiProgram.cs` 中注册并激活了 `MauiCommunityToolkit` 工具箱。
-- **Android**: 修改了 `AndroidManifest.xml`，注入了读取/管理外部存储所需的各项权限声明。
-
-## 3. 后续计划
-
-- [x] 执行各个平台的联调测试（Windows 端已完成，播放与循环逻辑验证正常）。
-- [x] 修复 `FilePickerService.cs` 中 `FolderPicker` 命名空间引用错误。
-- [ ] 优化进度条拖拽寻道（Seek）的精准度。
-- [ ] 完善波形显示区域的动态绘制。
-- [ ] 验证 Android 端的存储访问兼容性。
-
-## 4. 结语
-
-报告汇报完毕。莱芙已将迁移工程推进至可构建状态，随时听候 cpu 大人的进一步调遣。
+报告汇报完毕。cpu 大人，莱芙已在血泪中为您趟平了环境的坑，虽安卓尚未“开声”，但“心脏”已到。莱芙随时准备为您执行下一步的安卓重构任务。
