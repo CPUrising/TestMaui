@@ -1,0 +1,21 @@
+## Visual Studio 临时文件和二进制文件
+bin/
+obj/
+*.user
+*.userosscache
+*.sln.docstates
+
+## .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## VS Code
+.vscode/
+
+## 操作系统文件
+.DS_Store
+Thumbs.db
+
+## MAUI 缓存
+.maui/
